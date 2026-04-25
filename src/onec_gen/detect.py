@@ -95,8 +95,6 @@ class OneCDetector:
             self.local_app_data / "Programs" / "1cv8_x86",
             self.local_app_data / "Programs" / "1cv8_x64",
             *configured_roots,
-            # Учебная версия подтверждена локально, хотя этот каталог не описан
-            # в использованных официальных документах по обычной установке.
             self.program_files / "1cv8t",
             self.program_files_x86 / "1cv8t",
         )
