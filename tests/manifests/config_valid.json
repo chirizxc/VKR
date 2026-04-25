@@ -1,0 +1,21 @@
+{
+  "project": {
+    "name": "Demo",
+    "namespace": "DemoConfig"
+  },
+  "subsystems": [
+    {
+      "name": "Продажи"
+    }
+  ],
+  "catalogs": [
+    {
+      "name": "Номенклатура"
+    }
+  ],
+  "documents": [
+    {
+      "name": "Продажа"
+    }
+  ]
+}

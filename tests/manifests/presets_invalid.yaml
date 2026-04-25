@@ -1,0 +1,5 @@
+- id: broken
+  title: "Сломанный"
+  summary: "Некорректный пресет"
+  keywords:
+    - тест
