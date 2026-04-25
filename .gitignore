@@ -1,0 +1,19 @@
+# Python
+.venv/
+venv/
+build/
+dist/
+wheel/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Tools
+.ruff_cache/
+uv.lock
+
+# IDE
+.idea/
+
+# Word Documents
+docx/
