@@ -1,7 +1,7 @@
 import logging
 import os
 import shutil
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 from questionary.prompts.common import Choice
 
@@ -240,15 +240,21 @@ class OneCDetector:
         return choice
 
     def _candidate_kind(self, candidate: Path) -> str:
-        if candidate.name.lower() == EDUCATIONAL_ONEC:
+        if self._candidate_name(candidate) == EDUCATIONAL_ONEC:
             return "Учебная версия"
         return "Платформа"
 
     def _preferred_candidate(self, candidates: tuple[Path, ...]) -> Path:
         for candidate in candidates:
-            if candidate.name.lower() == EDUCATIONAL_ONEC:
+            if self._candidate_name(candidate) == EDUCATIONAL_ONEC:
                 return candidate
         return candidates[0]
+
+    def _candidate_name(self, candidate: Path) -> str:
+        candidate_name = candidate.name
+        if "\\" in candidate_name:
+            candidate_name = PureWindowsPath(candidate_name).name
+        return candidate_name.lower()
 
     def _format_candidate_title(
         self,
