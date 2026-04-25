@@ -85,5 +85,5 @@ jobs:
       - name: "Run ty"
         run: ty check
 
-      - name: "Run nox"
+      - name: "Run pytest"
         run: pytest

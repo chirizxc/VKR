@@ -3,10 +3,9 @@ import os
 import shutil
 from pathlib import Path
 
-from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 from questionary.prompts.common import Choice
 
-from onec_gen.consts import KBI_MESSAGE
+from onec_gen.consts import IS_WINDOWS, KBI_MESSAGE
 from onec_gen.exceptions import OneCBatchModeNotSupportedError, OneCNotFoundError
 from onec_gen.select import select_with_compact_answer
 
@@ -17,6 +16,13 @@ EDUCATIONAL_ONEC = "1cv8t.exe"
 BATCH_ONEC = "1cv8.exe"
 SUPPORTED_BATCH_ONEC = (EDUCATIONAL_ONEC, BATCH_ONEC)
 SUPPORTED_MANUAL_ONEC = (*SUPPORTED_BATCH_ONEC, "1cv8c.exe")
+
+if IS_WINDOWS:
+    from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
+else:
+
+    class NoConsoleScreenBufferError(Exception):
+        pass
 
 
 class OneCDetector:
@@ -265,9 +271,7 @@ class OneCDetector:
         )
 
     def _ibcmd_glob_patterns(self) -> tuple[str, ...]:
-        return (
-            f"*/bin/{IBCMD}",
-        )
+        return (f"*/bin/{IBCMD}",)
 
     def _normalize_onec_path(self, candidate_path: Path) -> Path | None:
         logger.debug("Нормализую кандидат пути к 1С: %s", candidate_path)

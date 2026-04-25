@@ -1,10 +1,9 @@
 from pathlib import Path
 
 import pytest
-from prompt_toolkit.output.win32 import NoConsoleScreenBufferError
 from pytest_mock import MockerFixture
 
-from onec_gen.detect import OneCDetector
+from onec_gen.detect import NoConsoleScreenBufferError, OneCDetector
 from onec_gen.exceptions import OneCBatchModeNotSupportedError, OneCNotFoundError
 
 
