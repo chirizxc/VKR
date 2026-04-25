@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["project"],
+  "additionalProperties": false,
+  "$defs": {
+    "localizedName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "valueType": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "date",
+            "catalog_ref",
+            "document_ref"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "precision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "scale": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "non_negative": {
+          "type": "boolean"
+        },
+        "date_fractions": {
+          "type": "string",
+          "enum": ["Date", "DateTime"]
+        }
+      }
+    },
+    "field": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/valueType"
+        },
+        "fill_checking": {
+          "type": "string",
+          "enum": ["DontCheck", "ShowError"]
+        },
+        "indexing": {
+          "type": "string",
+          "enum": ["DontIndex", "Index", "IndexWithAdditionalOrder"]
+        },
+        "full_text_search": {
+          "type": "string",
+          "enum": ["Use", "DontUse"]
+        },
+        "multiline": {
+          "type": "boolean"
+        },
+        "extended_edit": {
+          "type": "boolean"
+        },
+        "mark_negatives": {
+          "type": "boolean"
+        },
+        "fill_from_filling_value": {
+          "type": "boolean"
+        },
+        "use_in_totals": {
+          "type": "boolean"
+        },
+        "use": {
+          "type": "string",
+          "enum": ["ForItem", "ForFolder", "ForItemAndFolder"]
+        }
+      }
+    },
+    "tabularSection": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "fill_checking": {
+          "type": "string",
+          "enum": ["DontCheck", "ShowError"]
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "hierarchical": {
+          "type": "boolean"
+        },
+        "quick_choice": {
+          "type": "boolean"
+        },
+        "code_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "tabular_sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tabularSection"
+          }
+        }
+      }
+    },
+    "document": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "number_length": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "tabular_sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tabularSection"
+          }
+        },
+        "register_records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/localizedName"
+          }
+        }
+      }
+    },
+    "accumulationRegister": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "synonym": {
+          "type": "string"
+        },
+        "register_type": {
+          "type": "string",
+          "enum": ["Balance", "Turnovers"]
+        },
+        "dimensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/localizedName"
+        },
+        "profile": {
+          "type": "string",
+          "enum": ["full", "editor", "viewer"]
+        }
+      }
+    }
+  },
+  "properties": {
+    "project": {
+      "type": "object",
+      "required": ["name", "namespace"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "subsystems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/localizedName"
+          }
+        }
+      }
+    },
+    "catalogs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/catalog"
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/document"
+      }
+    },
+    "accumulation_registers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/accumulationRegister"
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/role"
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Rights xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://v8.1c.ru/8.2/roles" xsi:type="Rights" version="2.20">
+    <setForNewObjects>false</setForNewObjects>
+    <setForAttributesByDefault>true</setForAttributesByDefault>
+    <independentRightsOfChildObjects>false</independentRightsOfChildObjects>
+{% if context.profile == "full" %}
+    <object>
+        <name>Configuration.Конфигурация</name>
+{% for right_name in ("Administration", "DataAdministration", "UpdateDataBaseConfiguration", "ExclusiveMode", "ActiveUsers", "EventLog", "ThinClient", "WebClient", "ThickClient", "ExternalConnection", "Automation", "AllFunctionsMode", "SaveUserData", "Output") %}
+        <right>
+            <name>{{ right_name }}</name>
+            <value>true</value>
+        </right>
+{% endfor %}
+    </object>
+{% endif %}
+{% for object_rights in context.object_rights %}
+    <object>
+        <name>{{ object_rights.object_name }}</name>
+{% for right_name in object_rights.rights %}
+        <right>
+            <name>{{ right_name }}</name>
+            <value>true</value>
+        </right>
+{% endfor %}
+    </object>
+{% endfor %}
+</Rights>

@@ -1,0 +1,94 @@
+{% from "_macros.xml.j2" import render_generated_types, render_synonym, render_type_properties %}
+<?xml version="1.0" encoding="utf-8"?>
+<MetaDataObject xmlns="http://v8.1c.ru/8.3/MDClasses" xmlns:app="http://v8.1c.ru/8.2/managed-application/core" xmlns:cfg="http://v8.1c.ru/8.1/data/enterprise/current-config" xmlns:cmi="http://v8.1c.ru/8.2/managed-application/cmi" xmlns:ent="http://v8.1c.ru/8.1/data/enterprise" xmlns:lf="http://v8.1c.ru/8.2/managed-application/logform" xmlns:style="http://v8.1c.ru/8.1/data/ui/style" xmlns:sys="http://v8.1c.ru/8.1/data/ui/fonts/system" xmlns:v8="http://v8.1c.ru/8.1/data/core" xmlns:v8ui="http://v8.1c.ru/8.1/data/ui" xmlns:web="http://v8.1c.ru/8.1/data/ui/colors/web" xmlns:win="http://v8.1c.ru/8.1/data/ui/colors/windows" xmlns:xen="http://v8.1c.ru/8.3/xcf/enums" xmlns:xpr="http://v8.1c.ru/8.3/xcf/predef" xmlns:xr="http://v8.1c.ru/8.3/xcf/readable" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.20">
+    <AccumulationRegister uuid="{{ context.register_uuid }}">
+        <InternalInfo>
+{{ render_generated_types(context.generated_types) }}
+        </InternalInfo>
+        <Properties>
+            <Name>{{ context.register_name }}</Name>
+{{ render_synonym(context.synonym) }}
+            <Comment/>
+            <UseStandardCommands>true</UseStandardCommands>
+            <DefaultListForm/>
+            <AuxiliaryListForm/>
+            <RegisterType>{{ context.register_type }}</RegisterType>
+            <IncludeHelpInContents>false</IncludeHelpInContents>
+            <DataLockControlMode>Managed</DataLockControlMode>
+            <FullTextSearch>DontUse</FullTextSearch>
+            <EnableTotalsSplitting>true</EnableTotalsSplitting>
+            <ListPresentation/>
+            <ExtendedListPresentation/>
+            <Explanation/>
+        </Properties>
+        <ChildObjects>
+{% for resource in context.resources %}
+            <Resource uuid="{{ resource.uuid }}">
+                <Properties>
+                    <Name>{{ resource.field.name }}</Name>
+{{ render_synonym(resource.field.synonym) }}
+                    <Comment>{{ resource.field.comment }}</Comment>
+                    <Type>
+{{ render_type_properties(resource.field.type) | indent(24, true) }}
+                    </Type>
+                    <PasswordMode>false</PasswordMode>
+                    <Format/>
+                    <EditFormat/>
+                    <ToolTip/>
+                    <MarkNegatives>{{ "true" if resource.field.mark_negatives else "false" }}</MarkNegatives>
+                    <Mask/>
+                    <MultiLine>{{ "true" if resource.field.multiline else "false" }}</MultiLine>
+                    <ExtendedEdit>{{ "true" if resource.field.extended_edit else "false" }}</ExtendedEdit>
+                    <MinValue xsi:nil="true"/>
+                    <MaxValue xsi:nil="true"/>
+                    <FillChecking>{{ resource.field.fill_checking }}</FillChecking>
+                    <ChoiceFoldersAndItems>Items</ChoiceFoldersAndItems>
+                    <ChoiceParameterLinks/>
+                    <ChoiceParameters/>
+                    <QuickChoice>Auto</QuickChoice>
+                    <CreateOnInput>Auto</CreateOnInput>
+                    <ChoiceForm/>
+                    <LinkByType/>
+                    <ChoiceHistoryOnInput>Auto</ChoiceHistoryOnInput>
+                    <FullTextSearch>{{ resource.field.full_text_search }}</FullTextSearch>
+                </Properties>
+            </Resource>
+{% endfor %}
+{% for dimension in context.dimensions %}
+            <Dimension uuid="{{ dimension.uuid }}">
+                <Properties>
+                    <Name>{{ dimension.field.name }}</Name>
+{{ render_synonym(dimension.field.synonym) }}
+                    <Comment>{{ dimension.field.comment }}</Comment>
+                    <Type>
+{{ render_type_properties(dimension.field.type) | indent(24, true) }}
+                    </Type>
+                    <PasswordMode>false</PasswordMode>
+                    <Format/>
+                    <EditFormat/>
+                    <ToolTip/>
+                    <MarkNegatives>{{ "true" if dimension.field.mark_negatives else "false" }}</MarkNegatives>
+                    <Mask/>
+                    <MultiLine>{{ "true" if dimension.field.multiline else "false" }}</MultiLine>
+                    <ExtendedEdit>{{ "true" if dimension.field.extended_edit else "false" }}</ExtendedEdit>
+                    <MinValue xsi:nil="true"/>
+                    <MaxValue xsi:nil="true"/>
+                    <FillChecking>{{ dimension.field.fill_checking }}</FillChecking>
+                    <ChoiceFoldersAndItems>Items</ChoiceFoldersAndItems>
+                    <ChoiceParameterLinks/>
+                    <ChoiceParameters/>
+                    <QuickChoice>Auto</QuickChoice>
+                    <CreateOnInput>Auto</CreateOnInput>
+                    <ChoiceForm/>
+                    <LinkByType/>
+                    <ChoiceHistoryOnInput>Auto</ChoiceHistoryOnInput>
+                    <DenyIncompleteValues>false</DenyIncompleteValues>
+                    <Indexing>{{ dimension.field.indexing }}</Indexing>
+                    <FullTextSearch>{{ dimension.field.full_text_search }}</FullTextSearch>
+                    <UseInTotals>{{ "true" if dimension.field.use_in_totals else "false" }}</UseInTotals>
+                </Properties>
+            </Dimension>
+{% endfor %}
+        </ChildObjects>
+    </AccumulationRegister>
+</MetaDataObject>

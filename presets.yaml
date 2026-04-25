@@ -1,0 +1,542 @@
+- id: sales
+  title: "Продажи"
+  summary: "Шаблон для продаж, клиентов, документов реализации и базового учета операций."
+  keywords:
+    - продажи
+    - реализация
+    - клиенты
+    - договоры
+    - заказы
+  subsystems:
+    - name: Продажи
+    - name: CRM
+  catalogs:
+    - name: Клиенты
+      synonym: Клиенты
+      hierarchical: false
+      attributes:
+        - name: ИНН
+          type: { kind: string, length: 12 }
+        - name: Телефон
+          type: { kind: string, length: 20 }
+        - name: ЭлектроннаяПочта
+          type: { kind: string, length: 80 }
+        - name: КомментарийМенеджера
+          multiline: true
+          type: { kind: string, length: 200 }
+    - name: Договоры
+      synonym: Договоры с клиентами
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: ДатаНачала
+          type: { kind: date, date_fractions: Date }
+        - name: Активен
+          type: { kind: boolean }
+    - name: Номенклатура
+      synonym: Номенклатура
+      attributes:
+        - name: Артикул
+          indexing: Index
+          type: { kind: string, length: 20 }
+        - name: ЦенаПродажи
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+        - name: ЭтоУслуга
+          type: { kind: boolean }
+  documents:
+    - name: ЗаказКлиента
+      synonym: Заказ клиента
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          type: { kind: catalog_ref, target: Договоры }
+        - name: Комментарий
+          multiline: true
+          extended_edit: true
+          type: { kind: string, length: 200 }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+    - name: Реализация
+      synonym: Реализация товаров и услуг
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          type: { kind: catalog_ref, target: Договоры }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      register_records:
+        - Продажи
+        - ВзаиморасчетыСКлиентами
+  accumulation_registers:
+    - name: Продажи
+      synonym: Продажи
+      register_type: Turnovers
+      dimensions:
+        - name: Клиент
+          indexing: Index
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Номенклатура
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Номенклатура }
+      resources:
+        - name: Количество
+          type: { kind: number, precision: 12, scale: 3, non_negative: true }
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+    - name: ВзаиморасчетыСКлиентами
+      synonym: Взаиморасчеты с клиентами
+      register_type: Balance
+      dimensions:
+        - name: Клиент
+          indexing: Index
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Договоры }
+      resources:
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2 }
+  roles:
+    - name: ПолныеПрава
+      profile: full
+    - name: МенеджерПродаж
+      profile: editor
+    - name: ПросмотрПродаж
+      profile: viewer
+
+- id: retail-store
+  title: "Торговая точка"
+  summary: "Базовый контур для номенклатуры, складов, продаж и остатков товаров."
+  keywords:
+    - магазин
+    - розница
+    - склад
+    - продажи
+    - товары
+  subsystems:
+    - name: Продажи
+    - name: Склад
+    - name: НСИ
+  catalogs:
+    - name: Номенклатура
+      attributes:
+        - name: Артикул
+          indexing: Index
+          type: { kind: string, length: 20 }
+        - name: Штрихкод
+          type: { kind: string, length: 20 }
+        - name: ЦенаПродажи
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+    - name: Склады
+      hierarchical: true
+      quick_choice: true
+      attributes:
+        - name: НеИспользовать
+          type: { kind: boolean }
+    - name: Кассы
+      attributes:
+        - name: НомерКассы
+          type: { kind: string, length: 10 }
+        - name: Ответственный
+          type: { kind: string, length: 100 }
+  documents:
+    - name: ПоступлениеТоваров
+      attributes:
+        - name: Склад
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+    - name: Продажа
+      attributes:
+        - name: Склад
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+        - name: Касса
+          type: { kind: catalog_ref, target: Кассы }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+        - Продажи
+    - name: ПеремещениеТоваров
+      attributes:
+        - name: СкладОтправитель
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+        - name: СкладПолучатель
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+  accumulation_registers:
+    - name: ТоварныеЗапасы
+      register_type: Balance
+      dimensions:
+        - name: Номенклатура
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Номенклатура }
+        - name: Склад
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Склады }
+      resources:
+        - name: Количество
+          fill_checking: ShowError
+          type: { kind: number, precision: 12, scale: 3, non_negative: true }
+    - name: Продажи
+      register_type: Turnovers
+      dimensions:
+        - name: Номенклатура
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Номенклатура }
+        - name: Склад
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Склады }
+      resources:
+        - name: Количество
+          type: { kind: number, precision: 12, scale: 3, non_negative: true }
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+  roles:
+    - name: ПолныеПрава
+      profile: full
+    - name: ОператорТочки
+      profile: editor
+    - name: ПросмотрТочки
+      profile: viewer
+
+- id: services
+  title: "Услуги"
+  summary: "Контур для услуг, актов и взаиморасчетов с клиентами."
+  keywords:
+    - услуги
+    - акты
+    - клиенты
+    - заказы
+  subsystems:
+    - name: Услуги
+    - name: CRM
+  catalogs:
+    - name: Клиенты
+      attributes:
+        - name: Телефон
+          type: { kind: string, length: 20 }
+        - name: ЭлектроннаяПочта
+          type: { kind: string, length: 80 }
+        - name: КонтактноеЛицо
+          type: { kind: string, length: 100 }
+    - name: ДоговорыУслуг
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: ДатаНачала
+          type: { kind: date, date_fractions: Date }
+        - name: Активен
+          type: { kind: boolean }
+    - name: Услуги
+      attributes:
+        - name: БазоваяЦена
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+        - name: ЕдиницаИзмерения
+          type: { kind: string, length: 20 }
+        - name: НормоЧасы
+          type: { kind: number, precision: 8, scale: 2, non_negative: true }
+  documents:
+    - name: ЗаказНаУслугу
+      synonym: Заказ на услугу
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          type: { kind: catalog_ref, target: ДоговорыУслуг }
+        - name: ПлановаяДата
+          type: { kind: date, date_fractions: Date }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Услуги
+          attributes:
+            - name: Услуга
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Услуги }
+            - name: Количество
+              type: { kind: number, precision: 10, scale: 2, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+    - name: АктОказанияУслуг
+      synonym: Акт оказания услуг
+      attributes:
+        - name: Клиент
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          type: { kind: catalog_ref, target: ДоговорыУслуг }
+        - name: Основание
+          type: { kind: document_ref, target: ЗаказНаУслугу }
+        - name: СуммаДокумента
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      tabular_sections:
+        - name: Услуги
+          attributes:
+            - name: Услуга
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Услуги }
+            - name: Количество
+              type: { kind: number, precision: 10, scale: 2, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      register_records:
+        - ОказанныеУслуги
+        - ВзаиморасчетыСКлиентами
+  accumulation_registers:
+    - name: ОказанныеУслуги
+      register_type: Turnovers
+      dimensions:
+        - name: Клиент
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Услуга
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Услуги }
+      resources:
+        - name: Количество
+          type: { kind: number, precision: 10, scale: 2, non_negative: true }
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+    - name: ВзаиморасчетыСКлиентами
+      register_type: Balance
+      dimensions:
+        - name: Клиент
+          indexing: Index
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Клиенты }
+        - name: Договор
+          use_in_totals: true
+          type: { kind: catalog_ref, target: ДоговорыУслуг }
+      resources:
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2 }
+  roles:
+    - name: ПолныеПрава
+      profile: full
+    - name: МенеджерУслуг
+      profile: editor
+    - name: ПросмотрУслуг
+      profile: viewer
+
+- id: warehouse
+  title: "Склад"
+  summary: "Учет складов, приходов, перемещений и остатков."
+  keywords:
+    - склад
+    - остатки
+    - перемещение
+    - приход
+  subsystems:
+    - name: Склад
+    - name: Закупки
+  catalogs:
+    - name: Номенклатура
+      attributes:
+        - name: Артикул
+          indexing: Index
+          type: { kind: string, length: 20 }
+        - name: ЕдиницаХранения
+          type: { kind: string, length: 20 }
+    - name: Склады
+      hierarchical: true
+      quick_choice: true
+      attributes:
+        - name: Адрес
+          type: { kind: string, length: 120 }
+        - name: НеИспользовать
+          type: { kind: boolean }
+    - name: Поставщики
+      attributes:
+        - name: ИНН
+          type: { kind: string, length: 12 }
+        - name: Телефон
+          type: { kind: string, length: 20 }
+        - name: ЭлектроннаяПочта
+          type: { kind: string, length: 80 }
+  documents:
+    - name: ПоступлениеТоваров
+      attributes:
+        - name: Поставщик
+          fill_checking: ShowError
+          indexing: Index
+          type: { kind: catalog_ref, target: Поставщики }
+        - name: Склад
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+            - name: Цена
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+            - name: Сумма
+              type: { kind: number, precision: 12, scale: 2, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+        - Закупки
+    - name: ПеремещениеТоваров
+      attributes:
+        - name: СкладОтправитель
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+        - name: СкладПолучатель
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+    - name: СписаниеТоваров
+      attributes:
+        - name: Склад
+          fill_checking: ShowError
+          type: { kind: catalog_ref, target: Склады }
+        - name: Причина
+          multiline: true
+          type: { kind: string, length: 200 }
+      tabular_sections:
+        - name: Товары
+          attributes:
+            - name: Номенклатура
+              fill_checking: ShowError
+              type: { kind: catalog_ref, target: Номенклатура }
+            - name: Количество
+              fill_checking: ShowError
+              type: { kind: number, precision: 12, scale: 3, non_negative: true }
+      register_records:
+        - ТоварныеЗапасы
+  accumulation_registers:
+    - name: ТоварныеЗапасы
+      register_type: Balance
+      dimensions:
+        - name: Номенклатура
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Номенклатура }
+        - name: Склад
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Склады }
+      resources:
+        - name: Количество
+          fill_checking: ShowError
+          type: { kind: number, precision: 12, scale: 3, non_negative: true }
+    - name: Закупки
+      register_type: Turnovers
+      dimensions:
+        - name: Поставщик
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Поставщики }
+        - name: Номенклатура
+          use_in_totals: true
+          type: { kind: catalog_ref, target: Номенклатура }
+      resources:
+        - name: Количество
+          type: { kind: number, precision: 12, scale: 3, non_negative: true }
+        - name: Сумма
+          type: { kind: number, precision: 12, scale: 2, non_negative: true }
+  roles:
+    - name: ПолныеПрава
+      profile: full
+    - name: Кладовщик
+      profile: editor
+    - name: ПросмотрСклада
+      profile: viewer

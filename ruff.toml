@@ -1,0 +1,55 @@
+target-version = "py313"
+
+line-length = 90
+
+include = [
+    "src/**.py",
+    "tests/**.py",
+    "pyproject.toml",
+]
+
+[lint.isort]
+force-wrap-aliases = true
+combine-as-imports = true
+no-lines-before = ["local-folder"]
+
+[lint]
+preview = true
+select = ["ALL"]
+ignore = [
+    "ARG",     # Unused method argument
+    "D",       # Docstring's
+    ########
+    "CPY001",  # Check copyright notices within Python files
+    "ANN401",  # Check `typing.Any`
+    "SIM105",  # Force `try-except-pass` -> `contextlib.suppress`
+    "ISC004",  # Check for implicitly concatenated strings inside list, tuple, and set literals.
+    "RUF001",  # Русский язык
+    #######
+    "PLR0913", #
+    "PLR0915", #
+    "PLR0402", # lxml.etree импортируется через `from lxml import etree` для совместимости с ty
+    "PLR6201", # Check for membership tests on list and tuple literals
+    "PLR6301", #
+    ########
+    "TC001",   # \
+    "TC002",   #  ==> `typing.TYPE_CHECKING` block's
+    "TC003",   # /
+    "TC006",   # Add quotes to type expression in `typing.cast()`
+    ########
+    "S311",    # Force `random` -> `secrets`
+    "S404",    # subprocess нужен для вызова 1С Designer
+    "S603",    # команда собирается из локально контролируемых путей и параметров CLI
+]
+
+[lint.extend-per-file-ignores]
+"tests/**.py" = [
+    "S101",
+]
+
+[lint.pylint]
+max-args = 10
+
+[lint.flake8-tidy-imports.banned-api]
+"contextlib.suppress" = { msg = "Use `try-except-pass` instead" }
+"__future__.annotations" = { msg = "Directly quote annotations instead" }

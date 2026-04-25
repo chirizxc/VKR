@@ -1,0 +1,2 @@
+class OneCGenError(Exception):
+    pass

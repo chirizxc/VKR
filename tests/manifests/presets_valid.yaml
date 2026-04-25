@@ -1,0 +1,41 @@
+- id: sales
+  title: "Продажи"
+  summary: "Шаблон для продаж."
+  keywords:
+    - продажи
+    - реализация
+  subsystems:
+    - name: Продажи
+  catalogs:
+    - name: Клиенты
+      attributes:
+        - name: ИНН
+          type: { kind: string, length: 12 }
+  documents:
+    - name: Реализация
+      attributes:
+        - name: Клиент
+          type: { kind: catalog_ref, target: Клиенты }
+  accumulation_registers:
+    - name: Продажи
+      dimensions:
+        - name: Клиент
+          type: { kind: catalog_ref, target: Клиенты }
+      resources:
+        - name: Сумма
+          type: { kind: number, precision: 10, scale: 2 }
+  roles:
+    - name: ПолныеПрава
+      profile: full
+
+- id: services
+  title: "Услуги"
+  summary: "Шаблон для услуг."
+  keywords:
+    - услуги
+  subsystems:
+    - name: Услуги
+  catalogs:
+    - name: Клиенты
+  documents:
+    - name: АктОказанияУслуг

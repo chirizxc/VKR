@@ -1,0 +1,126 @@
+{% macro render_synonym(value) -%}
+{% if value %}
+            <Synonym>
+                <v8:item>
+                    <v8:lang>ru</v8:lang>
+                    <v8:content>{{ value }}</v8:content>
+                </v8:item>
+            </Synonym>
+{% else %}
+            <Synonym/>
+{% endif %}
+{%- endmacro %}
+
+{% macro render_generated_types(generated_types) -%}
+{% for item in generated_types %}
+            <xr:GeneratedType name="{{ item.name }}" category="{{ item.category }}">
+                <xr:TypeId>{{ item.type_id }}</xr:TypeId>
+                <xr:ValueId>{{ item.value_id }}</xr:ValueId>
+            </xr:GeneratedType>
+{% endfor %}
+{%- endmacro %}
+
+{% macro render_document_standard_attributes(attribute_names) -%}
+{% for attribute_name in attribute_names %}
+                <xr:StandardAttribute name="{{ attribute_name }}">
+                    <xr:LinkByType/>
+                    <xr:FillChecking>DontCheck</xr:FillChecking>
+                    <xr:MultiLine>false</xr:MultiLine>
+                    <xr:FillFromFillingValue>false</xr:FillFromFillingValue>
+                    <xr:CreateOnInput>Auto</xr:CreateOnInput>
+                    <xr:TypeReductionMode>TransformValues</xr:TypeReductionMode>
+                    <xr:MaxValue xsi:nil="true"/>
+                    <xr:ToolTip/>
+                    <xr:ExtendedEdit>false</xr:ExtendedEdit>
+                    <xr:Format/>
+                    <xr:ChoiceForm/>
+                    <xr:QuickChoice>Auto</xr:QuickChoice>
+                    <xr:ChoiceHistoryOnInput>Auto</xr:ChoiceHistoryOnInput>
+                    <xr:EditFormat/>
+                    <xr:PasswordMode>false</xr:PasswordMode>
+                    <xr:DataHistory>Use</xr:DataHistory>
+                    <xr:MarkNegatives>false</xr:MarkNegatives>
+                    <xr:MinValue xsi:nil="true"/>
+                    <xr:Synonym/>
+                    <xr:Comment/>
+                    <xr:FullTextSearch>Use</xr:FullTextSearch>
+                    <xr:ChoiceParameterLinks/>
+                    <xr:FillValue xsi:nil="true"/>
+                    <xr:Mask/>
+                    <xr:ChoiceParameters/>
+                </xr:StandardAttribute>
+{% endfor %}
+{%- endmacro %}
+
+{% macro render_type_properties(type) -%}
+{% if type.kind == "string" %}
+<v8:Type>xs:string</v8:Type>
+<v8:StringQualifiers>
+    <v8:Length>{{ type.length or 50 }}</v8:Length>
+    <v8:AllowedLength>Variable</v8:AllowedLength>
+</v8:StringQualifiers>
+{% elif type.kind == "number" %}
+<v8:Type>xs:decimal</v8:Type>
+<v8:NumberQualifiers>
+    <v8:Digits>{{ type.precision }}</v8:Digits>
+    <v8:FractionDigits>{{ type.scale }}</v8:FractionDigits>
+    <v8:AllowedSign>{% if type.non_negative %}Nonnegative{% else %}Any{% endif %}</v8:AllowedSign>
+</v8:NumberQualifiers>
+{% elif type.kind == "boolean" %}
+<v8:Type>xs:boolean</v8:Type>
+{% elif type.kind == "date" %}
+<v8:Type>xs:dateTime</v8:Type>
+<v8:DateQualifiers>
+    <v8:DateFractions>{{ type.date_fractions }}</v8:DateFractions>
+</v8:DateQualifiers>
+{% elif type.kind == "catalog_ref" %}
+<v8:Type>cfg:CatalogRef.{{ type.target }}</v8:Type>
+{% elif type.kind == "document_ref" %}
+<v8:Type>cfg:DocumentRef.{{ type.target }}</v8:Type>
+{% endif %}
+{%- endmacro %}
+
+{% macro render_field(field_context, include_fill_from = true, include_use = false, include_use_in_totals = false) -%}
+{% set field = field_context.field %}
+            <Attribute uuid="{{ field_context.uuid }}">
+                <Properties>
+                    <Name>{{ field.name }}</Name>
+{{ render_synonym(field.synonym) }}
+                    <Comment>{{ field.comment }}</Comment>
+                    <Type>
+{{ render_type_properties(field.type) | indent(24, true) }}
+                    </Type>
+                    <PasswordMode>false</PasswordMode>
+                    <Format/>
+                    <EditFormat/>
+                    <ToolTip/>
+                    <MarkNegatives>{{ "true" if field.mark_negatives else "false" }}</MarkNegatives>
+                    <Mask/>
+                    <MultiLine>{{ "true" if field.multiline else "false" }}</MultiLine>
+                    <ExtendedEdit>{{ "true" if field.extended_edit else "false" }}</ExtendedEdit>
+                    <MinValue xsi:nil="true"/>
+                    <MaxValue xsi:nil="true"/>
+{% if include_fill_from %}
+                    <FillFromFillingValue>{{ "true" if field.fill_from_filling_value else "false" }}</FillFromFillingValue>
+                    <FillValue xsi:nil="true"/>
+{% endif %}
+                    <FillChecking>{{ field.fill_checking }}</FillChecking>
+                    <ChoiceFoldersAndItems>Items</ChoiceFoldersAndItems>
+                    <ChoiceParameterLinks/>
+                    <ChoiceParameters/>
+                    <QuickChoice>Auto</QuickChoice>
+                    <CreateOnInput>Auto</CreateOnInput>
+                    <ChoiceForm/>
+                    <LinkByType/>
+                    <ChoiceHistoryOnInput>Auto</ChoiceHistoryOnInput>
+{% if include_use %}
+                    <Use>{{ field.use }}</Use>
+{% endif %}
+                    <Indexing>{{ field.indexing }}</Indexing>
+                    <FullTextSearch>{{ field.full_text_search }}</FullTextSearch>
+{% if include_use_in_totals %}
+                    <UseInTotals>{{ "true" if field.use_in_totals else "false" }}</UseInTotals>
+{% endif %}
+                </Properties>
+            </Attribute>
+{%- endmacro %}
