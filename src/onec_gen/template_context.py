@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-import c_uuid_v7
+import uuid7_rs
 
 from onec_gen.models import (
     AccumulationRegisterSpec,
@@ -139,7 +139,7 @@ class TemplateContextBuilder:
         return CatalogTemplateContext(
             catalog_name=catalog.name,
             synonym=catalog.synonym or catalog.name,
-            catalog_uuid=str(c_uuid_v7.uuid7()),
+            catalog_uuid=str(uuid7_rs.uuid7()),
             hierarchical=catalog.hierarchical,
             quick_choice=catalog.quick_choice,
             code_length=catalog.code_length,
@@ -165,7 +165,7 @@ class TemplateContextBuilder:
         return DocumentTemplateContext(
             document_name=document.name,
             synonym=document.synonym or document.name,
-            document_uuid=str(c_uuid_v7.uuid7()),
+            document_uuid=str(uuid7_rs.uuid7()),
             number_length=document.number_length,
             generated_types=self._build_generated_types(
                 (
@@ -190,7 +190,7 @@ class TemplateContextBuilder:
         return AccumulationRegisterTemplateContext(
             register_name=accumulation_register.name,
             synonym=accumulation_register.synonym or accumulation_register.name,
-            register_uuid=str(c_uuid_v7.uuid7()),
+            register_uuid=str(uuid7_rs.uuid7()),
             register_type=accumulation_register.register_type,
             generated_types=self._build_generated_types(
                 (
@@ -214,7 +214,7 @@ class TemplateContextBuilder:
     ) -> RoleTemplateContext:
         return RoleTemplateContext(
             role_name=role.name,
-            role_uuid=str(c_uuid_v7.uuid7()),
+            role_uuid=str(uuid7_rs.uuid7()),
             profile=role.profile,
             object_rights=self._build_role_object_rights(role, config),
         )
@@ -226,7 +226,7 @@ class TemplateContextBuilder:
     ) -> SubsystemTemplateContext:
         return SubsystemTemplateContext(
             subsystem_name=subsystem.name,
-            subsystem_uuid=str(c_uuid_v7.uuid7()),
+            subsystem_uuid=str(uuid7_rs.uuid7()),
             content_items=(
                 *(f"Catalog.{catalog.name}" for catalog in config.catalogs),
                 *(f"Document.{document.name}" for document in config.documents),
@@ -242,7 +242,7 @@ class TemplateContextBuilder:
         fields: tuple[FieldSpec, ...],
     ) -> tuple[FieldTemplateContext, ...]:
         return tuple(
-            FieldTemplateContext(field=field, uuid=str(c_uuid_v7.uuid7()))
+            FieldTemplateContext(field=field, uuid=str(uuid7_rs.uuid7()))
             for field in fields
         )
 
@@ -284,7 +284,7 @@ class TemplateContextBuilder:
         return TabularSectionTemplateContext(
             name=section.name,
             synonym=section.synonym or section.name,
-            uuid=str(c_uuid_v7.uuid7()),
+            uuid=str(uuid7_rs.uuid7()),
             fill_checking=section.fill_checking,
             generated_types=self._build_generated_types(
                 (
@@ -423,8 +423,8 @@ class TemplateContextBuilder:
                 GeneratedTypeContext(
                     name=f"{type_prefix}.{object_name}",
                     category=category,
-                    type_id=str(c_uuid_v7.uuid7()),
-                    value_id=str(c_uuid_v7.uuid7()),
+                    type_id=str(uuid7_rs.uuid7()),
+                    value_id=str(uuid7_rs.uuid7()),
                 ),
             )
         return tuple(generated_types)
